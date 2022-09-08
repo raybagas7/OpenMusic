@@ -1,5 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
-/* eslint-disable*/
+
 class SongsHandler {
   constructor(service, validator) {
     this.service = service;
@@ -14,8 +14,10 @@ class SongsHandler {
   async postSongHandler(request, h) {
     try {
       this.validator.validateSongPayload(request.payload);
+      /* eslint-disable */
       const { title, year, genre, performer, duration, albumId } =
         request.payload;
+      /* eslint-enable */
       const songId = await this.service.addSong({
         title,
         year,

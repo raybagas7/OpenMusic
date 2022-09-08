@@ -4,14 +4,14 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const { mapDBToModel } = require('../../utils');
 
-/* eslint-disable */
 class SongsService {
   constructor() {
     this.pool = new Pool();
   }
-
+  /* eslint-disable */
   async addSong({ title, year, genre, performer, duration, albumId }) {
     const id = 'song-' + nanoid(16);
+    /* eslint-enable */
     const query = {
       text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
       values: [id, title, year, genre, performer, duration, albumId],
@@ -27,24 +27,25 @@ class SongsService {
   }
 
   async getSongs({ title, performer }) {
+    /* eslint-disable */
     if (title && performer) {
       const query = {
         text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
-        values: [title + '%', performer + '%'],
+        values: [title.concat('%'), performer.concat('%')],
       };
       const result = await this.pool.query(query);
       return result.rows;
     } else if (title) {
       const query = {
         text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
-        values: [title + '%'],
+        values: [title.concat('%')],
       };
       const result = await this.pool.query(query);
       return result.rows;
     } else if (performer) {
       const query = {
         text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
-        values: [performer + '%'],
+        values: [performer.concat('%')],
       };
       const result = await this.pool.query(query);
       return result.rows;
@@ -53,6 +54,7 @@ class SongsService {
     const result = await this.pool.query(
       'SELECT id, title, performer FROM songs'
     );
+    /* eslint-enable */
     return result.rows;
   }
 
@@ -70,8 +72,9 @@ class SongsService {
 
     return result.rows.map(mapDBToModel)[0];
   }
-
+  /* eslint-disable */
   async editSongById(id, { title, year, genre, performer, duration, albumId }) {
+    /* eslint-enable */
     const query = {
       text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id',
       values: [title, year, genre, performer, duration, albumId, id],

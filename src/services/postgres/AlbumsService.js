@@ -4,14 +4,15 @@ const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const { mapDBToModelCombine } = require('../../utils');
 
-/* eslint-disable */
 class AlbumsService {
   constructor() {
     this.pool = new Pool();
   }
 
   async addAlbum({ name, year }) {
+    /* eslint-disable */
     const id = 'album-' + nanoid(16);
+    /* eslint-enable */
 
     const query = {
       text: 'INSERT INTO albums VALUES ($1, $2, $3) RETURNING id',

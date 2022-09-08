@@ -1,5 +1,6 @@
 /* eslint-disable */
 const { nanoid } = require('nanoid');
+var _ = require('lodash');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
@@ -38,7 +39,8 @@ class AlbumService {
   }
   /*=============================================================================*/
   editAlbumById(id, { name, year }) {
-    const albumIndex = this.albums.findIndex((index) => index.id === id);
+    // const albumIndex = this.albums.findIndex((index) => index.id === id);
+    const albumIndex = _.findIndex(this.albums, ['id', id]);
 
     if (albumIndex === -1) {
       throw new NotFoundError('Gagal memperbarui album, Id tidak ditemukan');
@@ -52,7 +54,8 @@ class AlbumService {
   }
   /*=============================================================================*/
   deleteAlbumById(id) {
-    const albumIndex = this.albums.findIndex((index) => index.id === id);
+    // const albumIndex = this.albums.findIndex((index) => index.id === id);
+    const albumIndex = _.findIndex(this.albums, ['id', id]);
 
     if (albumIndex === -1) {
       throw new NotFoundError('Album gagal dihapus, Id tidak ditemukan');

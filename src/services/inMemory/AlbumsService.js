@@ -1,9 +1,8 @@
-/* eslint-disable */
 const { nanoid } = require('nanoid');
-var _ = require('lodash');
+const _ = require('lodash');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-
+/* eslint-disable */
 class AlbumsService {
   constructor() {
     this.albums = [];

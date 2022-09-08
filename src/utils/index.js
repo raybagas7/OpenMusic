@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable*/
 const mapDBToModel = ({
   id,
   title,
@@ -17,4 +17,17 @@ const mapDBToModel = ({
   albumId: album_id,
 });
 
-module.exports = { mapDBToModel };
+const mapDBToModelCombine = (album, songs) => {
+  const combined = {
+    ...album[0],
+    songs: songs.map((song) => ({
+      id: song.id,
+      title: song.title,
+      performer: song.performer,
+    })),
+  };
+
+  return combined;
+};
+
+module.exports = { mapDBToModel, mapDBToModelCombine };

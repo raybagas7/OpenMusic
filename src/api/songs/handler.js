@@ -1,6 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
-
-/* eslint-disable */
+/* eslint-disable*/
 class SongsHandler {
   constructor(service, validator) {
     this.service = service;
@@ -57,8 +56,9 @@ class SongsHandler {
     }
   }
 
-  async getSongsHandler() {
-    const songs = await this.service.getSongs();
+  async getSongsHandler(request) {
+    const { title, performer } = request.query;
+    const songs = await this.service.getSongs({ title, performer });
 
     return {
       status: 'success',

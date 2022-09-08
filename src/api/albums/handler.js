@@ -1,6 +1,4 @@
 const ClientError = require('../../exceptions/ClientError');
-
-/* eslint-disable */
 class AlbumsHandler {
   constructor(service, validator) {
     this.service = service;

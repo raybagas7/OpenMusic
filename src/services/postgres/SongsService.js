@@ -25,14 +25,37 @@ class SongsService {
 
     return result.rows[0].id;
   }
-  /*=============================================================================*/
-  async getSongs() {
+
+  async getSongs({ title, performer }) {
+    if (title && performer) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+        values: [title + '%', performer + '%'],
+      };
+      const result = await this.pool.query(query);
+      return result.rows;
+    } else if (title) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
+        values: [title + '%'],
+      };
+      const result = await this.pool.query(query);
+      return result.rows;
+    } else if (performer) {
+      const query = {
+        text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
+        values: [performer + '%'],
+      };
+      const result = await this.pool.query(query);
+      return result.rows;
+    }
+
     const result = await this.pool.query(
       'SELECT id, title, performer FROM songs'
     );
     return result.rows;
   }
-  /*=============================================================================*/
+
   async getSongById(id) {
     const query = {
       text: 'SELECT * FROM songs WHERE id = $1',
@@ -47,7 +70,7 @@ class SongsService {
 
     return result.rows.map(mapDBToModel)[0];
   }
-  /*=============================================================================*/
+
   async editSongById(id, { title, year, genre, performer, duration, albumId }) {
     const query = {
       text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id',
@@ -60,7 +83,7 @@ class SongsService {
       throw new NotFoundError('Gagal memperbarui Lagu, Id tidak ditemukan');
     }
   }
-  /*=============================================================================*/
+
   async deleteSongById(id) {
     const query = {
       text: 'DELETE FROM songs WHERE id = $1 RETURNING id',

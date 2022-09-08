@@ -4,7 +4,7 @@ var _ = require('lodash');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
-class AlbumService {
+class AlbumsService {
   constructor() {
     this.albums = [];
   }
@@ -65,4 +65,4 @@ class AlbumService {
   }
 }
 
-module.exports = AlbumService;
+module.exports = AlbumsService;

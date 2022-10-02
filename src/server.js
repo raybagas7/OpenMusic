@@ -23,10 +23,16 @@ const AuthenticationsService = require('./services/postgres/AuthenticationsServi
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
+//Playlists
+const playlists = require('./api/playlists');
+const PlaylistsService = require('./services/postgres/PlaylistsService');
+const PlayListValidator = require('./validator/playlists');
+
 const init = async () => {
   const albumService = new AlbumService();
   const songsService = new SongsService();
   const usersService = new UsersService();
+  const playlistService = new PlaylistsService();
   const authenticationsService = new AuthenticationsService();
 
   const server = Hapi.server({
@@ -58,7 +64,7 @@ const init = async () => {
     validate: (artifacts) => ({
       isValid: true,
       credentials: {
-        id: artifacts.decode.payload.id,
+        id: artifacts.decoded.payload.id,
       },
     }),
   });
@@ -83,6 +89,13 @@ const init = async () => {
       options: {
         service: usersService,
         validator: UsersValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistService,
+        validator: PlayListValidator,
       },
     },
     {

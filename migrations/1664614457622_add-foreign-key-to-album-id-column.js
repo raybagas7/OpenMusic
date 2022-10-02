@@ -1,10 +1,22 @@
 /* eslint-disable camelcase */
 exports.up = (pgm) => {
   pgm.sql(
-    "INSERT INTO albums(id, name, years) VALUES('old_album', 'old_album', 'old_album')"
+    "INSERT INTO albums(id, name, year) VALUES('old_album', 'old_album', '2020')"
   );
 
-  pgm.sql("UPDATE songs SET 'album_id' WHERE album_id IS NULL");
+  pgm.sql("UPDATE songs SET album_id = 'old_album' WHERE album_id IS NULL");
+
+  pgm.addConstraint(
+    'songs',
+    'fk_songs.album_id_albums.id',
+    'FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE'
+  );
 };
 
-exports.down = (pgm) => {};
+exports.down = (pgm) => {
+  pgm.dropConstraint('songs', 'fk_songs.album_id_albums.id');
+
+  pgm.sql("UPDATE songs SET album_id = NULL WHERE album_id = 'old_album'");
+
+  pgm.sql("DELETE FROM albums WHERE id = 'old_album'");
+};

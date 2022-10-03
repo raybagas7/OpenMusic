@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { mapDBToModelPlaylistSongs } = require('../../utils');
 
 class PlaylistsService {
   constructor() {
@@ -72,8 +73,83 @@ class PlaylistsService {
     }
   }
 
+  async verifySongId(songId) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Lagu tidak ditemukan');
+    }
+  }
+
   async addSongToPlaylist(playlistId, songId) {
+    await this.verifySongId(songId);
+
     const id = 'playlistsongs-' + nanoid(16);
+
+    const query = {
+      text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
+      values: [id, playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Lagu gagal ditambahkan pada playlists');
+    }
+
+    return result.rows[0].id;
+  }
+
+  async getSongsFromPlaylist(owner, playlistId) {
+    const query_playlist = {
+      text: `SELECT playlists.id, playlists.name, users.username 
+      FROM playlists 
+      INNER JOIN users 
+      ON playlists.owner=users.id 
+      WHERE playlists.owner = $1
+      AND playlists.id = $2`,
+      values: [owner, playlistId],
+    };
+
+    const result_playlist = await this._pool.query(query_playlist);
+
+    const query = {
+      text: `SELECT songs.id as song_id, songs.title, songs.performer
+      FROM playlists
+      INNER JOIN users
+      ON playlists.owner = users.id
+      JOIN playlist_songs
+      ON playlists.id = playlist_songs.playlist_id
+      JOIN songs
+      ON playlist_songs.song_id = songs.id
+      WHERE playlists.owner = $1
+      AND playlists.id = $2`,
+      values: [owner, playlistId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return mapDBToModelPlaylistSongs(result_playlist.rows, result.rows);
+  }
+
+  async deleteSongsFromPlaylist(playlistId, songId) {
+    const query = {
+      text: `DELETE FROM playlist_songs
+      WHERE playlist_id = $1
+      AND song_id = $2`,
+      values: [playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Lagu tidak ditemukan');
+    }
   }
 }
 

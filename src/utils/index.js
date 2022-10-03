@@ -30,4 +30,21 @@ const mapDBToModelCombine = (album, songs) => {
   return combined;
 };
 
-module.exports = { mapDBToModel, mapDBToModelCombine };
+const mapDBToModelPlaylistSongs = (playlist_data, playlist_songs) => {
+  const result = {
+    ...playlist_data[0],
+    songs: playlist_songs.map((song) => ({
+      id: song.song_id,
+      title: song.title,
+      performer: song.performer,
+    })),
+  };
+
+  return result;
+};
+
+module.exports = {
+  mapDBToModel,
+  mapDBToModelCombine,
+  mapDBToModelPlaylistSongs,
+};

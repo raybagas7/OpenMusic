@@ -10,9 +10,7 @@ class AlbumsService {
   }
 
   async addAlbum({ name, year }) {
-    /* eslint-disable */
     const id = 'album-' + nanoid(16);
-    /* eslint-enable */
 
     const query = {
       text: 'INSERT INTO albums VALUES ($1, $2, $3) RETURNING id',

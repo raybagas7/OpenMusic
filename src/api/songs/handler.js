@@ -9,10 +9,10 @@ class SongsHandler {
 
   async postSongHandler(request, h) {
     this.validator.validateSongPayload(request.payload);
-    /* eslint-disable */
+
     const { title, year, genre, performer, duration, albumId } =
       request.payload;
-    /* eslint-enable */
+
     const songId = await this.service.addSong({
       title,
       year,
@@ -49,7 +49,7 @@ class SongsHandler {
     };
   }
 
-  async getSongByIdHandler(request, h) {
+  async getSongByIdHandler(request) {
     const { id } = request.params;
     const song = await this.service.getSongById(id);
     return {
@@ -60,7 +60,7 @@ class SongsHandler {
     };
   }
 
-  async putSongByIdHandler(request, h) {
+  async putSongByIdHandler(request) {
     this.validator.validateSongPayload(request.payload);
     const { id } = request.params;
     await this.service.editSongById(id, request.payload);
@@ -71,7 +71,7 @@ class SongsHandler {
     };
   }
 
-  async deleteSongByIdHandler(request, h) {
+  async deleteSongByIdHandler(request) {
     const { id } = request.params;
     await this.service.deleteSongById(id);
     return {

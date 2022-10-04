@@ -43,8 +43,23 @@ const mapDBToModelPlaylistSongs = (playlist_data, playlist_songs) => {
   return result;
 };
 
+const mapDBToModelActivities = (id, activities) => {
+  const result = {
+    playlistId: id,
+    activities: activities.map((activity) => ({
+      username: activity.username,
+      title: activity.title,
+      action: activity.action,
+      time: activity.time,
+    })),
+  };
+
+  return result;
+};
+
 module.exports = {
   mapDBToModel,
   mapDBToModelCombine,
   mapDBToModelPlaylistSongs,
+  mapDBToModelActivities,
 };

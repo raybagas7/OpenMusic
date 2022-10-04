@@ -3,11 +3,15 @@ const { Pool } = require('pg');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToModelPlaylistSongs } = require('../../utils');
+const {
+  mapDBToModelPlaylistSongs,
+  mapDBToModelActivities,
+} = require('../../utils');
 
 class PlaylistsService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
+    this._collaborationService = collaborationService;
   }
 
   async addPlaylist({ name, owner }) {
@@ -32,8 +36,11 @@ class PlaylistsService {
       text: `SELECT playlists.id, playlists.name, users.username 
       FROM playlists 
       INNER JOIN users 
-      ON playlists.owner=users.id 
-      WHERE playlists.owner = $1`,
+      ON playlists.owner=users.id
+      LEFT JOIN collaborations
+      ON collaborations.playlist_id = playlists.id
+      WHERE playlists.owner = $1 OR collaborations.user_id = $1
+      GROUP BY playlists.id, users.username`,
       values: [owner],
     };
 
@@ -86,7 +93,7 @@ class PlaylistsService {
     }
   }
 
-  async addSongToPlaylist(playlistId, songId) {
+  async addSongToPlaylist(playlistId, songId, userId, action) {
     await this.verifySongId(songId);
 
     const id = 'playlistsongs-' + nanoid(16);
@@ -101,8 +108,24 @@ class PlaylistsService {
     if (!result.rowCount) {
       throw new InvariantError('Lagu gagal ditambahkan pada playlists');
     }
-
+    await this.playlistSongActivities(playlistId, songId, userId, action);
     return result.rows[0].id;
+  }
+
+  async playlistSongActivities(playlistId, songId, userId, action) {
+    const id = 'playlistActivities-' + nanoid(16);
+    let time = new Date();
+
+    const query = {
+      text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6)',
+      values: [id, playlistId, songId, userId, action, time],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Activities gagal ditambahkan');
+    }
   }
 
   async getSongsFromPlaylist(owner, playlistId) {
@@ -110,9 +133,13 @@ class PlaylistsService {
       text: `SELECT playlists.id, playlists.name, users.username 
       FROM playlists 
       INNER JOIN users 
-      ON playlists.owner=users.id 
-      WHERE playlists.owner = $1
-      AND playlists.id = $2`,
+      ON playlists.owner=users.id
+      LEFT JOIN collaborations
+      ON collaborations.playlist_id = playlists.id
+      WHERE playlists.id = $2
+      AND playlists.owner = $1
+      OR collaborations.user_id = $1
+      GROUP BY playlists.id, users.username`,
       values: [owner, playlistId],
     };
 
@@ -127,8 +154,11 @@ class PlaylistsService {
       ON playlists.id = playlist_songs.playlist_id
       JOIN songs
       ON playlist_songs.song_id = songs.id
-      WHERE playlists.owner = $1
-      AND playlists.id = $2`,
+      LEFT JOIN collaborations
+      ON collaborations.playlist_id = playlists.id
+      WHERE playlists.id = $2
+      AND playlists.owner = $1
+      OR collaborations.user_id = $1`,
       values: [owner, playlistId],
     };
 
@@ -137,7 +167,7 @@ class PlaylistsService {
     return mapDBToModelPlaylistSongs(result_playlist.rows, result.rows);
   }
 
-  async deleteSongsFromPlaylist(playlistId, songId) {
+  async deleteSongsFromPlaylist(playlistId, songId, userId, action) {
     const query = {
       text: `DELETE FROM playlist_songs
       WHERE playlist_id = $1
@@ -150,6 +180,51 @@ class PlaylistsService {
     if (!result.rowCount) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
+
+    await this.playlistSongActivities(playlistId, songId, userId, action);
+  }
+
+  async verifyPlaylistAccess(playlistId, userId) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, userId);
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId);
+      } catch {
+        throw error;
+      }
+    }
+  }
+
+  async getPlaylistActivities(playlistId, userId) {
+    const query = {
+      text: `SELECT playlist_song_activities.*, users.username, songs.title
+      FROM playlist_song_activities
+      LEFT JOIN playlists
+      ON playlist_song_activities.playlist_id = playlists.id
+      INNER JOIN users
+      ON playlists.owner = users.id
+      LEFT JOIN playlist_songs
+      ON playlists.id = playlist_songs.playlist_id
+      INNER JOIN songs
+      ON playlist_song_activities.song_id = songs.id
+      WHERE playlist_song_activities.playlist_id = $1
+      AND user_id = $2
+      ORDER BY time`,
+      values: [playlistId, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Playlist activities tidak ditemukan');
+    }
+
+    return mapDBToModelActivities(playlistId, result.rows);
   }
 }
 

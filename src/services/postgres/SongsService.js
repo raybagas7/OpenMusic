@@ -9,8 +9,10 @@ class SongsService {
     this.pool = new Pool();
   }
 
-  async addSong({ title, year, genre, performer, duration, albumId }) {
-    const id = 'song-' + nanoid(16);
+  async addSong({
+    title, year, genre, performer, duration, albumId
+  }) {
+    const id = `song-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
@@ -31,17 +33,17 @@ class SongsService {
     if (title && performer) {
       query = {
         text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
-        values: [title.concat('%'), performer.concat('%')],
+        values: [`%${title}%`, `%${performer}%`],
       };
     } else if (title) {
       query = {
         text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1',
-        values: [title.concat('%')],
+        values: [`%${title}%`],
       };
     } else if (performer) {
       query = {
         text: 'SELECT id, title, performer FROM songs WHERE performer ILIKE $1',
-        values: [performer.concat('%')],
+        values: [`%${performer}%`],
       };
     } else {
       query = {
@@ -60,14 +62,16 @@ class SongsService {
 
     const result = await this.pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu tidak ditemukan');
     }
 
     return result.rows.map(mapDBToModel)[0];
   }
 
-  async editSongById(id, { title, year, genre, performer, duration, albumId }) {
+  async editSongById(id, {
+    title, year, genre, performer, duration, albumId
+  }) {
     const query = {
       text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id',
       values: [title, year, genre, performer, duration, albumId, id],
@@ -75,7 +79,7 @@ class SongsService {
 
     const result = await this.pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Gagal memperbarui Lagu, Id tidak ditemukan');
     }
   }
@@ -88,7 +92,7 @@ class SongsService {
 
     const result = await this.pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rowCount) {
       throw new NotFoundError('Lagu gagal dihapus, Id tidak ditemukan');
     }
   }

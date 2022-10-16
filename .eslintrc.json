@@ -12,8 +12,7 @@
     "no-console": "off",
     "linebreak-style": 0,
     "no-underscore-dangle": 0,
-    "comma-dangle": "off",
-    "operator-linebreak": ["error", "after"],
-    "implicit-arrow-linebreak": ["error", "below", "beside"]
+    "comma-dangle": "off"
+    // "implicit-arrow-linebreak": ["error", "below", "beside"]
   }
 }

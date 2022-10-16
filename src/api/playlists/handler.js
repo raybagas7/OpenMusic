@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+
 class PlaylistsHandler {
   constructor(service, validator) {
     this._service = service;
@@ -58,7 +59,7 @@ class PlaylistsHandler {
     const { id: credentialId } = request.auth.credentials;
     const action = 'add';
     await this._service.verifyPlaylistAccess(playlistId, credentialId);
-    const ps_id = await this._service.addSongToPlaylist(
+    const psId = await this._service.addSongToPlaylist(
       playlistId,
       songId,
       credentialId,
@@ -69,7 +70,7 @@ class PlaylistsHandler {
       status: 'success',
       message: 'Lagu berhasil ditambahkan ke Playlist',
       data: {
-        ps_id,
+        psId,
       },
     });
     response.code(201);

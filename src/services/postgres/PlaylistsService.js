@@ -15,7 +15,7 @@ class PlaylistsService {
   }
 
   async addPlaylist({ name, owner }) {
-    const id = 'playlist-' + nanoid(16);
+    const id = `playlist-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
@@ -96,7 +96,7 @@ class PlaylistsService {
   async addSongToPlaylist(playlistId, songId, userId, action) {
     await this.verifySongId(songId);
 
-    const id = 'playlistsongs-' + nanoid(16);
+    const id = `playlistsongs-${nanoid(16)}`;
 
     const query = {
       text: 'INSERT INTO playlist_songs VALUES($1, $2, $3) RETURNING id',
@@ -113,8 +113,8 @@ class PlaylistsService {
   }
 
   async playlistSongActivities(playlistId, songId, userId, action) {
-    const id = 'playlistActivities-' + nanoid(16);
-    let time = new Date();
+    const id = `playlistActivities-${nanoid(16)}`;
+    const time = new Date();
 
     const query = {
       text: 'INSERT INTO playlist_song_activities VALUES($1, $2, $3, $4, $5, $6)',
@@ -129,7 +129,7 @@ class PlaylistsService {
   }
 
   async getSongsFromPlaylist(owner, playlistId) {
-    const query_playlist = {
+    const queryPlaylist = {
       text: `SELECT playlists.id, playlists.name, users.username 
       FROM playlists 
       INNER JOIN users 
@@ -143,7 +143,7 @@ class PlaylistsService {
       values: [owner, playlistId],
     };
 
-    const result_playlist = await this._pool.query(query_playlist);
+    const resultPlaylist = await this._pool.query(queryPlaylist);
 
     const query = {
       text: `SELECT songs.id as song_id, songs.title, songs.performer
@@ -164,7 +164,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query);
 
-    return mapDBToModelPlaylistSongs(result_playlist.rows, result.rows);
+    return mapDBToModelPlaylistSongs(resultPlaylist.rows, result.rows);
   }
 
   async deleteSongsFromPlaylist(playlistId, songId, userId, action) {

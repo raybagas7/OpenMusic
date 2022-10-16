@@ -1,4 +1,5 @@
 const autoBind = require('auto-bind');
+
 class SongsHandler {
   constructor(service, validator) {
     this.service = service;
@@ -10,17 +11,7 @@ class SongsHandler {
   async postSongHandler(request, h) {
     this.validator.validateSongPayload(request.payload);
 
-    const { title, year, genre, performer, duration, albumId } =
-      request.payload;
-
-    const songId = await this.service.addSong({
-      title,
-      year,
-      genre,
-      performer,
-      duration,
-      albumId,
-    });
+    const songId = await this.service.addSong(request.payload);
 
     const response = h.response({
       status: 'success',
@@ -40,11 +31,7 @@ class SongsHandler {
     return {
       status: 'success',
       data: {
-        songs: songs.map((song) => ({
-          id: song.id,
-          title: song.title,
-          performer: song.performer,
-        })),
+        songs
       },
     };
   }

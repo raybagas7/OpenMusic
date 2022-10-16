@@ -2,34 +2,34 @@ require('dotenv').config();
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 
-//Album
+// Album
 const albums = require('./api/albums');
 const AlbumService = require('./services/postgres/AlbumsService');
 const AlbumValidator = require('./validator/albums');
 
-//Songs
+// Songs
 const songs = require('./api/songs');
 const SongsService = require('./services/postgres/SongsService');
 const SongValidator = require('./validator/songs');
 
-//Users
+// Users
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 
-//Authentications
+// Authentications
 const authentications = require('./api/authentications');
 const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
-//Playlists
+// Playlists
 const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlayListValidator = require('./validator/playlists');
 const ClientError = require('./exceptions/ClientError');
 
-//Collaborations
+// Collaborations
 const collaborations = require('./api/collaborations');
 const CollaborationsService = require('./services/postgres/CollaborationsService');
 const CollaborationsValidator = require('./validator/collaborations');

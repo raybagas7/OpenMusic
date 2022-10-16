@@ -1,6 +1,4 @@
-/* eslint-disable */
 // Album
-
 exports.up = (pgm) => {
   pgm.createTable('albums', {
     id: {

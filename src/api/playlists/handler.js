@@ -35,7 +35,9 @@ class PlaylistsHandler {
 
     return {
       status: 'success',
-      data: { playlists },
+      data: {
+        playlists,
+      },
     };
   }
 
@@ -89,7 +91,9 @@ class PlaylistsHandler {
 
     return {
       status: 'success',
-      data: { playlist },
+      data: {
+        playlist,
+      },
     };
   }
 

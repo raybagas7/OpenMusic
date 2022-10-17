@@ -7,4 +7,6 @@ const AlbumPayloadSchema = Joi.object({
     .required(),
 });
 
-module.exports = { AlbumPayloadSchema };
+module.exports = {
+  AlbumPayloadSchema,
+};

@@ -19,8 +19,12 @@ class AuthenticationsHandler {
       password
     );
 
-    const accessToken = this._tokenManager.generateAccessToken({ id });
-    const refreshToken = this._tokenManager.generateRefreshToken({ id });
+    const accessToken = this._tokenManager.generateAccessToken({
+      id
+    });
+    const refreshToken = this._tokenManager.generateRefreshToken({
+      id
+    });
 
     await this._authenticationsService.addRefreshToken(refreshToken);
 
@@ -43,7 +47,9 @@ class AuthenticationsHandler {
     await this._authenticationsService.verifyRefreshToken(refreshToken);
     const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
-    const accessToken = this._tokenManager.generateAccessToken({ id });
+    const accessToken = this._tokenManager.generateAccessToken({
+      id
+    });
 
     return {
       status: 'success',

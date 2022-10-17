@@ -11,7 +11,10 @@ class AlbumsHandler {
   async postAlbumHandler(request, h) {
     this.validator.validateAlbumPayload(request.payload);
     const { name, year } = request.payload;
-    const albumId = await this.service.addAlbum({ name, year });
+    const albumId = await this.service.addAlbum({
+      name,
+      year,
+    });
 
     const response = h.response({
       status: 'success',
@@ -56,6 +59,10 @@ class AlbumsHandler {
       message: 'Catatan berhasil dihapus',
     };
   }
+
+  // async likesAlbumByIdHandler(request) {
+  //   const { id } = request.params;
+  // }
 }
 
 module.exports = AlbumsHandler;

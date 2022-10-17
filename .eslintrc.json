@@ -12,7 +12,16 @@
     "no-console": "off",
     "linebreak-style": 0,
     "no-underscore-dangle": 0,
-    "comma-dangle": "off"
-    // "implicit-arrow-linebreak": ["error", "below", "beside"]
+    "comma-dangle": "off",
+    "operator-linebreak": ["error", "none"],
+    "object-curly-newline": [
+      "error",
+      {
+        "ObjectExpression": "always",
+        "ObjectPattern": { "multiline": true },
+        "ImportDeclaration": "never",
+        "ExportDeclaration": { "multiline": true, "minProperties": 3 }
+      }
+    ]
   }
 }

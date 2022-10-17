@@ -5,4 +5,6 @@ const CollaborationPayloadSchema = Joi.object({
   userId: Joi.string().required(),
 });
 
-module.exports = { CollaborationPayloadSchema };
+module.exports = {
+  CollaborationPayloadSchema
+};

@@ -19,7 +19,10 @@ const mapDBToModel = ({
 
 const mapDBToModelCombine = (album, songs) => {
   const combined = {
-    ...album[0],
+    id: album[0].id,
+    name: album[0].name,
+    year: album[0].year,
+    coverUrl: album[0].cover,
     songs: songs.map((song) => ({
       id: song.id,
       title: song.title,

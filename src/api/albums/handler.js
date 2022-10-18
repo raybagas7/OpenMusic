@@ -60,9 +60,38 @@ class AlbumsHandler {
     };
   }
 
-  // async likesAlbumByIdHandler(request) {
-  //   const { id } = request.params;
-  // }
+  async addLikesAlbumByIdHandler(request, h) {
+    const { id: albumId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this.service.getAlbumById(albumId);
+    const like = await this.service.likesAlbumById(credentialId, albumId);
+
+    const response = h.response({
+      status: 'success',
+      message: like,
+    });
+
+    response.code(201);
+    return response;
+  }
+
+  async getLikesAlbumByIdHandler(request, h) {
+    const { id: albumId } = request.params;
+
+    const { likes, isCache } = await this.service.getTotalLikes(albumId);
+
+    const response = h.response({
+      status: 'success',
+      data: {
+        likes
+      },
+    });
+    if (isCache) {
+      response.header('X-Data-Source', 'cache');
+    }
+    return response;
+  }
 }
 
 module.exports = AlbumsHandler;
